@@ -1,0 +1,43 @@
+{
+  "name": "chess",
+  "version": "1.0.0",
+  "description": "2-player chass game in React",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "start-dev": "nodemon server/index.js",
+    "bundle": "./node_modules/.bin/webpack -d --watch",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZeMunchkin/chess.git"
+  },
+  "author": "Sara Brandes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZeMunchkin/chess/issues"
+  },
+  "homepage": "https://github.com/ZeMunchkin/chess#readme",
+  "dependencies": {
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "express": "^4.16.3",
+    "install": "^0.11.0",
+    "npm": "^5.8.0",
+    "path": "^0.12.7",
+    "proptypes": "^1.1.0",
+    "react": "^16.3.0",
+    "react-dom": "^16.3.0",
+    "webpack": "^3.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "nodemon": "^1.17.2"
+  }
+}
