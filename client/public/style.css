@@ -1,0 +1,24 @@
+.square {
+  height: 75px;
+  width: 75px;
+  border: solid;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.piece {
+  height: 70px;
+  width: 70px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.dark .square {
+  background-color: #4D4D4B;
+}

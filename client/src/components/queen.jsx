@@ -7,17 +7,17 @@ const images = {
 };
 
 const Queen = props => (
-  <div className="queen">
-    <img
-      className="piece"
-      alt={`${props.color}-queen`}
-      src={images[props.color]}
-    />
-  </div>
+  <img
+    id={props.loc}
+    className={`piece ${props.color} queen`}
+    alt={`${props.color}-queen`}
+    src={images[props.color]}
+  />
 );
 
 export default Queen;
 
 Queen.propTypes = {
   color: propTypes.string.isRequired,
+  loc: propTypes.string.isRequired,
 };

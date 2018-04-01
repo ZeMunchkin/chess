@@ -7,17 +7,17 @@ const images = {
 };
 
 const Knight = props => (
-  <div className="knight">
-    <img
-      className="piece"
-      alt={`${props.color}-knight`}
-      src={images[props.color]}
-    />
-  </div>
+  <img
+    id={props.loc}
+    className={`piece ${props.color} knight`}
+    alt={`${props.color}-knight`}
+    src={images[props.color]}
+  />
 );
 
 export default Knight;
 
 Knight.propTypes = {
   color: propTypes.string.isRequired,
+  loc: propTypes.string.isRequired,
 };
