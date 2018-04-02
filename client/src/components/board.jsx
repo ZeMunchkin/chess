@@ -8,6 +8,8 @@ import knightMove from '../helperFunctions/knightMoves';
 import bishopMove from '../helperFunctions/bishopMoves';
 import pawnMove from '../helperFunctions/pawnMoves';
 
+import inCheck from '../helperFunctions/inCheck';
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -23,14 +25,19 @@ class Board extends React.Component {
         ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR'],
       ],
       turn: 'White',
-      selectedPiece: null,
+      selectedPiece: {
+        location: null,
+        type: null,
+        color: null,
+      },
+      whiteKingLoc: 'r7c4',
+      blackKingLoc: 'r0c4',
     };
-    this.movePiece = this.movePiece.bind(this);
     this.selectPiece = this.selectPiece.bind(this);
   }
 
   movePiece(fromId, toId) {
-    const board = this.state.board.slice();
+    const board = this.copyBoard();
 
     const toRow = toId[1];
     const toCol = toId[3];
@@ -41,63 +48,131 @@ class Board extends React.Component {
     board[toRow][toCol] = piece;
     board[fromRow][fromCol] = '';
 
-    const turn = this.state.turn === 'White' ? 'Black' : 'White';
-    const selectedPiece = null;
-    this.setState({ board, turn, selectedPiece });
+    return board;
   }
 
   selectPiece(event) {
-    const board = this.state.board.slice();
     const classes = event.target.className.split(' ');
-    const location = event.target.id;
+    const endLoc = event.target.id;
+    const piece = this.state.selectedPiece;
+    let moveable;
 
     if (classes[1] === this.state.turn.toLowerCase()) {
       const selected = {
-        location: location,
+        location: endLoc, // eslint-disable-line
         type: classes[2],
         color: classes[1],
       };
       this.setState({ selectedPiece: selected });
-    } else if (this.state.selectedPiece) {
-      // if yes, check if it's a legal move for that piece
-      const piece = this.state.selectedPiece;
-      let moveable = null;
+      return;
+    }
 
-      switch (piece.type) {
-        case 'king':
-          moveable = kingMove(board, piece.location, location, piece.color);
-          break;
-        case 'queen':
-          moveable = queenMove(board, piece.location, location, piece.color);
-          break;
-        case 'rook':
-          moveable = rookMove(board, piece.location, location, piece.color);
-          break;
-        case 'knight':
-          moveable = knightMove(board, piece.location, location, piece.color);
-          break;
-        case 'bishop':
-          moveable = bishopMove(board, piece.location, location, piece.color);
-          break;
-        case 'pawn':
-          moveable = pawnMove(board, piece.location, location, piece.color);
-          break;
-        default:
-          moveable = false;
-      }
-      
+    if (piece.location) {
+      moveable = this.checkValidMove(endLoc);
       if (moveable) {
-        this.movePiece(this.state.selectedPiece.location, event.target.id);
+        const board = this.movePiece(piece.location, endLoc);
+        if (piece.type === 'king' && piece.color === 'white') {
+          this.setState({ whiteKingLoc: endLoc });
+        } else if (piece.type === 'king' && piece.color === 'black') {
+          this.setState({ blackKingLoc: endLoc });
+        }
+        this.playTurn(board);
       }
     }
   }
 
+  playTurn(board) {
+    const turn = this.state.turn === 'White' ? 'Black' : 'White';
+    const selectedPiece = {
+      location: null,
+      type: null,
+      color: null,
+    };
+    this.setState({ board, turn, selectedPiece });
+  }
+
+  checkValidMove(endLoc) {
+    const piece = this.state.selectedPiece;
+    let board = this.copyBoard();
+    let moveable = null;
+    let changeKingPosition = false;
+    let kingInCheck;
+
+    switch (piece.type) {
+      case 'king':
+        moveable = kingMove(board, piece.location, endLoc, piece.color);
+        changeKingPosition = true;
+        break;
+      case 'queen':
+        moveable = queenMove(board, piece.location, endLoc, piece.color);
+        break;
+      case 'rook':
+        moveable = rookMove(board, piece.location, endLoc, piece.color);
+        break;
+      case 'knight':
+        moveable = knightMove(board, piece.location, endLoc, piece.color);
+        break;
+      case 'bishop':
+        moveable = bishopMove(board, piece.location, endLoc, piece.color);
+        break;
+      case 'pawn':
+        moveable = pawnMove(board, piece.location, endLoc, piece.color);
+        break;
+      default:
+        moveable = false;
+    }
+
+    if (!moveable) {
+      return false;
+    }
+
+    board = this.movePiece(piece.location, endLoc);
+    if (changeKingPosition) {
+      kingInCheck = inCheck(board, endLoc, piece.color);
+      changeKingPosition = false;
+    } else {
+      const king = piece.color === 'white' ? this.state.whiteKingLoc : this.state.blackKingLoc;
+      kingInCheck = inCheck(board, king, piece.color);
+    }
+
+    if (kingInCheck) {
+      return false;
+    }
+
+    return true;
+  }
+
+  copyBoard() {
+    const curBoard = this.state.board;
+    const copiedBoard = [];
+    for (let i = 0; i < curBoard.length; i += 1) {
+      copiedBoard.push(curBoard[i].slice());
+    }
+    return copiedBoard;
+  }
+
   renderBoard(board) {
+    const returnShaded = (row, col) => {
+      if (row % 2 === 0 && col % 2 !== 0) {
+        return true;
+      } else if (row % 2 !== 0 && col % 2 === 0) {
+        return true;
+      }
+      return false;
+    };
+
     return (
       board.map((row, rowIndex) => (
-        <div id={`row${rowIndex}`} className="row">
+        <div id={`row${rowIndex}`} className="row" key={`row${rowIndex}`}> {/* eslint-disable-line */}
           {row.map((piece, colIndex) => (
-            <Square piece={piece} loc={`r${rowIndex}c${colIndex}`} move={this.movePiece} select={this.selectPiece} />
+            <Square
+              piece={piece}
+              loc={`r${rowIndex}c${colIndex}`}
+              select={this.selectPiece}
+              shaded={returnShaded(rowIndex, colIndex)}
+              selected={this.state.selectedPiece.location}
+              key={`r${rowIndex}c${colIndex}`} /* eslint-disable-line */
+            />
           ))}
         </div>
       ))
@@ -106,7 +181,7 @@ class Board extends React.Component {
 
   render() {
     return (
-      <div>
+      <div id="appContainer">
         <h1>{`${this.state.turn}'s Move`}</h1>
         <div id="boardContainer">
           {this.renderBoard(this.state.board)}

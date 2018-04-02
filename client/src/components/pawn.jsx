@@ -2,8 +2,8 @@ import React from 'react';
 import propTypes from 'proptypes';
 
 const images = {
-  black: 'https://s3-us-west-1.amazonaws.com/chess-pieces/blackPawn.png',
-  white: 'https://s3-us-west-1.amazonaws.com/chess-pieces/whitePawn.png',
+  black: 'https://s3-us-west-1.amazonaws.com/chess-icons/blackPawn.png',
+  white: 'https://s3-us-west-1.amazonaws.com/chess-icons/whitePawn.png',
 };
 
 const Pawn = props => (

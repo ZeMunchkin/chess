@@ -20,7 +20,7 @@ const pawnMove = (board, startLoc, endLoc, team) => {
       const endPiece = board[endRow][endCol];
       if (!endPiece && startCol === endCol) {
         return true;
-      } else if (Math.abs(startCol - endCol) === 1 && endPiece[0] !== color) {
+      } else if (Math.abs(startCol - endCol) === 1 && endPiece && endPiece[0] !== color) {
         return true;
       }
     }
