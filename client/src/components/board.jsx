@@ -32,6 +32,7 @@ class Board extends React.Component {
       },
       whiteKingLoc: 'r7c4',
       blackKingLoc: 'r0c4',
+      inCheck: '',
     };
     this.selectPiece = this.selectPiece.bind(this);
   }
@@ -71,24 +72,38 @@ class Board extends React.Component {
       moveable = this.checkValidMove(endLoc);
       if (moveable) {
         const board = this.movePiece(piece.location, endLoc);
+
         if (piece.type === 'king' && piece.color === 'white') {
           this.setState({ whiteKingLoc: endLoc });
         } else if (piece.type === 'king' && piece.color === 'black') {
           this.setState({ blackKingLoc: endLoc });
         }
-        this.playTurn(board);
+
+        let kingInCheck = '';
+        const opposingKing = piece.color === 'white' ? 'black' : 'white';
+        const opposingKingLoc = this.state[`${opposingKing}KingLoc`];
+        if (inCheck(board, opposingKingLoc, opposingKing)) {
+          kingInCheck = opposingKing;
+        }
+
+        this.playTurn(board, kingInCheck);
       }
     }
   }
 
-  playTurn(board) {
+  playTurn(board, inCheck) {
     const turn = this.state.turn === 'White' ? 'Black' : 'White';
     const selectedPiece = {
       location: null,
       type: null,
       color: null,
     };
-    this.setState({ board, turn, selectedPiece });
+    this.setState({
+      board,
+      turn,
+      selectedPiece,
+      inCheck,
+    });
   }
 
   checkValidMove(endLoc) {
