@@ -6,7 +6,6 @@ import Rook from '../helperFunctions/pieceClasses/rookPiece';
 import Knight from '../helperFunctions/pieceClasses/knightPiece';
 import Bishop from '../helperFunctions/pieceClasses/bishopPiece';
 import Pawn from '../helperFunctions/pieceClasses/pawnPiece';
-
 import checkIfCheck from '../helperFunctions/moveFuncs/inCheck';
 
 class Board extends React.Component {
@@ -44,8 +43,8 @@ class Board extends React.Component {
     this.selectPiece = this.selectPiece.bind(this);
   }
 
-  movePiece(fromId, toId) {
-    const board = this.copyBoard();
+  movePiece(fromId, toId, boardParam) {
+    const board = boardParam || this.copyBoard();
 
     const toRow = toId.slice(1, 2);
     const toCol = toId.slice(3);
@@ -73,14 +72,28 @@ class Board extends React.Component {
     }
 
     if (pieceLoc) {
-      const pieceRow = pieceLoc.slice(1, 2);
-      const pieceCol = pieceLoc.slice(3);
-      const piece = this.state.board[pieceRow][pieceCol];
       moveable = this.checkValidMove(endLoc);
 
       if (moveable) {
-        const board = this.movePiece(pieceLoc, endLoc);
+        const pieceRow = pieceLoc.slice(1, 2);
+        const pieceCol = pieceLoc.slice(3);
+        const piece = this.state.board[pieceRow][pieceCol];
+        let board = this.movePiece(pieceLoc, endLoc);
         piece.loc = endLoc;
+
+        if (typeof moveable === 'string') {
+          let castleDirection = moveable.split(' ');
+          castleDirection = castleDirection[1];
+
+          const castleFromCol = castleDirection === 'left' ? 0 : 7;
+          const castleToCol = castleDirection === 'left' ? 3 : 5;
+          const rook = board[pieceRow][castleFromCol];
+          const castleStart = `r${pieceRow}c${castleFromCol}`;
+          const castleEnd = `r${pieceRow}c${castleToCol}`;
+
+          board = this.movePiece(castleStart, castleEnd, board);
+          rook.hasMoved = true;
+        }
 
         if (piece.type === 'rook' || piece.type === 'king') {
           piece.hasMoved = true;
