@@ -13,7 +13,7 @@ const Square = (props) => {
   }
   return (
     <div id={props.loc} className={classes} onClick={props.select}> {/*eslint-disable-line*/}
-      {render.renderPiece(props.piece, props.loc, props.select)}
+      {render(props.piece, props.loc)}
     </div>
   );
 };
@@ -22,7 +22,10 @@ export default Square;
 
 Square.propTypes = {
   loc: propTypes.string.isRequired,
-  piece: propTypes.string.isRequired,
+  piece: propTypes.shape({
+    color: propTypes.string,
+    type: propTypes.string,
+  }),
   select: propTypes.func.isRequired,
   shaded: propTypes.bool.isRequired,
   selected: propTypes.string,
@@ -30,4 +33,5 @@ Square.propTypes = {
 
 Square.defaultProps = {
   selected: '',
+  piece: {},
 };

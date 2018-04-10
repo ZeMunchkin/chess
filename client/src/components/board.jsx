@@ -1,35 +1,42 @@
 import React from 'react';
 import Square from './square';
+import King from '../helperFunctions/pieceClasses/kingPiece';
+import Queen from '../helperFunctions/pieceClasses/queenPiece';
+import Rook from '../helperFunctions/pieceClasses/rookPiece';
+import Knight from '../helperFunctions/pieceClasses/knightPiece';
+import Bishop from '../helperFunctions/pieceClasses/bishopPiece';
+import Pawn from '../helperFunctions/pieceClasses/pawnPiece';
 
-import kingMove from '../helperFunctions/kingMoves';
-import queenMove from '../helperFunctions/queenMoves';
-import rookMove from '../helperFunctions/rookMoves';
-import knightMove from '../helperFunctions/knightMoves';
-import bishopMove from '../helperFunctions/bishopMoves';
-import pawnMove from '../helperFunctions/pawnMoves';
-
-import inCheck from '../helperFunctions/inCheck';
+import checkIfCheck from '../helperFunctions/moveFuncs/inCheck';
 
 class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       board: [
-        ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR'],
-        ['bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP'],
-        ['', '', '', '', '', '', '', ''],
-        ['', '', '', '', '', '', '', ''],
-        ['', '', '', '', '', '', '', ''],
-        ['', '', '', '', '', '', '', ''],
-        ['wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP'],
-        ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR'],
+        [
+          new Rook('black', 'r0c0'), new Knight('black', 'r0c1'), new Bishop('black', 'r0c2'), new Queen('black', 'r0c3'),
+          new King('black', 'r0c4'), new Bishop('black', 'r0c5'), new Knight('black', 'r0c6'), new Rook('black', 'r0c7'),
+        ],
+        [
+          new Pawn('black', 'r1c0'), new Pawn('black', 'r1c1'), new Pawn('black', 'r1c2'), new Pawn('black', 'r1c3'),
+          new Pawn('black', 'r1c4'), new Pawn('black', 'r1c5'), new Pawn('black', 'r1c6'), new Pawn('black', 'r1c7'),
+        ],
+        [{}, {}, {}, {}, {}, {}, {}, {}],
+        [{}, {}, {}, {}, {}, {}, {}, {}],
+        [{}, {}, {}, {}, {}, {}, {}, {}],
+        [{}, {}, {}, {}, {}, {}, {}, {}],
+        [
+          new Pawn('white', 'r6c0'), new Pawn('white', 'r6c1'), new Pawn('white', 'r6c2'), new Pawn('white', 'r6c3'),
+          new Pawn('white', 'r6c4'), new Pawn('white', 'r6c5'), new Pawn('white', 'r6c6'), new Pawn('white', 'r6c7'),
+        ],
+        [
+          new Rook('white', 'r7c0'), new Knight('white', 'r7c1'), new Bishop('white', 'r7c2'), new Queen('white', 'r7c3'),
+          new King('white', 'r7c4'), new Bishop('white', 'r7c5'), new Knight('white', 'r7c6'), new Rook('white', 'r7c7'),
+        ],
       ],
       turn: 'White',
-      selectedPiece: {
-        location: null,
-        type: null,
-        color: null,
-      },
+      selectedPiece: null,
       whiteKingLoc: 'r7c4',
       blackKingLoc: 'r0c4',
       inCheck: '',
@@ -40,38 +47,44 @@ class Board extends React.Component {
   movePiece(fromId, toId) {
     const board = this.copyBoard();
 
-    const toRow = toId[1];
-    const toCol = toId[3];
-    const fromRow = fromId[1];
-    const fromCol = fromId[3];
+    const toRow = toId.slice(1, 2);
+    const toCol = toId.slice(3);
+    const fromRow = fromId.slice(1, 2);
+    const fromCol = fromId.slice(3);
 
     const piece = board[fromRow][fromCol];
     board[toRow][toCol] = piece;
-    board[fromRow][fromCol] = '';
+    board[fromRow][fromCol] = {};
 
     return board;
   }
 
   selectPiece(event) {
     const classes = event.target.className.split(' ');
+    const pieceLoc = this.state.selectedPiece;
+    const pieceColor = classes[1];
     const endLoc = event.target.id;
-    const piece = this.state.selectedPiece;
     let moveable;
 
-    if (classes[1] === this.state.turn.toLowerCase()) {
-      const selected = {
-        location: endLoc, // eslint-disable-line
-        type: classes[2],
-        color: classes[1],
-      };
+    if (pieceColor === this.state.turn.toLowerCase()) {
+      const selected = endLoc;
       this.setState({ selectedPiece: selected });
       return;
     }
 
-    if (piece.location) {
+    if (pieceLoc) {
+      const pieceRow = pieceLoc.slice(1, 2);
+      const pieceCol = pieceLoc.slice(3);
+      const piece = this.state.board[pieceRow][pieceCol];
       moveable = this.checkValidMove(endLoc);
+
       if (moveable) {
-        const board = this.movePiece(piece.location, endLoc);
+        const board = this.movePiece(pieceLoc, endLoc);
+        piece.loc = endLoc;
+
+        if (piece.type === 'rook' || piece.type === 'king') {
+          piece.hasMoved = true;
+        }
 
         if (piece.type === 'king' && piece.color === 'white') {
           this.setState({ whiteKingLoc: endLoc });
@@ -82,10 +95,9 @@ class Board extends React.Component {
         let kingInCheck = '';
         const opposingKing = piece.color === 'white' ? 'black' : 'white';
         const opposingKingLoc = this.state[`${opposingKing}KingLoc`];
-        if (inCheck(board, opposingKingLoc, opposingKing)) {
+        if (checkIfCheck(board, opposingKingLoc, opposingKing)) {
           kingInCheck = opposingKing;
         }
-
         this.playTurn(board, kingInCheck);
       }
     }
@@ -93,11 +105,7 @@ class Board extends React.Component {
 
   playTurn(board, inCheck) {
     const turn = this.state.turn === 'White' ? 'Black' : 'White';
-    const selectedPiece = {
-      location: null,
-      type: null,
-      color: null,
-    };
+    const selectedPiece = null;
     this.setState({
       board,
       turn,
@@ -107,61 +115,41 @@ class Board extends React.Component {
   }
 
   checkValidMove(endLoc) {
-    const piece = this.state.selectedPiece;
+    const pieceLoc = this.state.selectedPiece;
+    const pieceRow = pieceLoc.slice(1, 2);
+    const pieceCol = pieceLoc.slice(3);
     let board = this.copyBoard();
-    let moveable = null;
-    let changeKingPosition = false;
+    const piece = board[pieceRow][pieceCol];
+    let changeKingPosition = piece.type === 'king';
     let kingInCheck;
 
-    switch (piece.type) {
-      case 'king':
-        moveable = kingMove(board, piece.location, endLoc, piece.color);
-        changeKingPosition = true;
-        break;
-      case 'queen':
-        moveable = queenMove(board, piece.location, endLoc, piece.color);
-        break;
-      case 'rook':
-        moveable = rookMove(board, piece.location, endLoc, piece.color);
-        break;
-      case 'knight':
-        moveable = knightMove(board, piece.location, endLoc, piece.color);
-        break;
-      case 'bishop':
-        moveable = bishopMove(board, piece.location, endLoc, piece.color);
-        break;
-      case 'pawn':
-        moveable = pawnMove(board, piece.location, endLoc, piece.color);
-        break;
-      default:
-        moveable = false;
-    }
+    let moveable = piece.move(board, endLoc);
 
     if (!moveable) {
       return false;
     }
 
-    board = this.movePiece(piece.location, endLoc);
+    board = this.movePiece(pieceLoc, endLoc);
     if (changeKingPosition) {
-      kingInCheck = inCheck(board, endLoc, piece.color);
+      kingInCheck = checkIfCheck(board, endLoc, piece.color);
       changeKingPosition = false;
     } else {
       const king = piece.color === 'white' ? this.state.whiteKingLoc : this.state.blackKingLoc;
-      kingInCheck = inCheck(board, king, piece.color);
+      kingInCheck = checkIfCheck(board, king, piece.color);
     }
 
     if (kingInCheck) {
-      return false;
+      moveable = false;
     }
 
-    return true;
+    return moveable;
   }
 
   copyBoard() {
     const curBoard = this.state.board;
     const copiedBoard = [];
-    for (let i = 0; i < curBoard.length; i += 1) {
-      copiedBoard.push(curBoard[i].slice());
+    for (let key in curBoard) { // eslint-disable-line
+      copiedBoard[key] = curBoard[key].slice();
     }
     return copiedBoard;
   }
@@ -185,7 +173,7 @@ class Board extends React.Component {
               loc={`r${rowIndex}c${colIndex}`}
               select={this.selectPiece}
               shaded={returnShaded(rowIndex, colIndex)}
-              selected={this.state.selectedPiece.location}
+              selected={this.state.selectedPiece}
               key={`r${rowIndex}c${colIndex}`} /* eslint-disable-line */
             />
           ))}

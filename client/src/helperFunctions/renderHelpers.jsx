@@ -1,33 +1,35 @@
 import React from 'react';
 
-import Pawn from '../components/pawn';
-import Bishop from '../components/bishop';
-import Knight from '../components/knight';
-import Rook from '../components/rook';
-import Queen from '../components/queen';
-import King from '../components/king';
+import PawnClass from '../components/pawnClass';
+import BishopClass from '../components/bishopClass';
+import KnightClass from '../components/knightClass';
+import RookClass from '../components/rookClass';
+import QueenClass from '../components/queenClass';
+import KingClass from '../components/kingClass';
 
-const renderHelpers = {
-  renderPiece: (piece, location) => {
-    const color = piece[0] === 'w' ? 'white' : 'black';
+const renderPiece = (piece, location) => {
+  if (!piece) {
+    return null;
+  }
 
-    switch (piece[1]) {
-      case 'P':
-        return (<Pawn color={color} loc={location} />);
-      case 'R':
-        return (<Rook color={color} loc={location} />);
-      case 'N':
-        return (<Knight color={color} loc={location} />);
-      case 'B':
-        return (<Bishop color={color} loc={location} />);
-      case 'Q':
-        return (<Queen color={color} loc={location} />);
-      case 'K':
-        return (<King color={color} loc={location} />);
-      default:
-        return (null);
-    }
-  },
+  const { color } = piece;
+
+  switch (piece.type) {
+    case 'pawn':
+      return (<PawnClass color={color} loc={location} />);
+    case 'rook':
+      return (<RookClass color={color} loc={location} />);
+    case 'knight':
+      return (<KnightClass color={color} loc={location} />);
+    case 'bishop':
+      return (<BishopClass color={color} loc={location} />);
+    case 'queen':
+      return (<QueenClass color={color} loc={location} />);
+    case 'king':
+      return (<KingClass color={color} loc={location} />);
+    default:
+      return (null);
+  }
 };
 
-export default renderHelpers;
+export default renderPiece;
