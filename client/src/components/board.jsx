@@ -82,17 +82,7 @@ class Board extends React.Component {
         piece.loc = endLoc;
 
         if (typeof moveable === 'string') {
-          let castleDirection = moveable.split(' ');
-          castleDirection = castleDirection[1];
-
-          const castleFromCol = castleDirection === 'left' ? 0 : 7;
-          const castleToCol = castleDirection === 'left' ? 3 : 5;
-          const rook = board[pieceRow][castleFromCol];
-          const castleStart = `r${pieceRow}c${castleFromCol}`;
-          const castleEnd = `r${pieceRow}c${castleToCol}`;
-
-          board = this.movePiece(castleStart, castleEnd, board);
-          rook.hasMoved = true;
+          board = this.handleCastle(moveable, pieceRow, board);
         }
 
         if (piece.type === 'rook' || piece.type === 'king') {
@@ -165,6 +155,20 @@ class Board extends React.Component {
       copiedBoard[key] = curBoard[key].slice();
     }
     return copiedBoard;
+  }
+
+  handleCastle(moveString, row, board) {
+    let castleDirection = moveString.split(' ');
+    castleDirection = castleDirection[1]; // eslint-disable-line
+
+    const castleFromCol = castleDirection === 'left' ? 0 : 7;
+    const castleToCol = castleDirection === 'left' ? 3 : 5;
+    const rook = board[row][castleFromCol];
+    const castleStart = `r${row}c${castleFromCol}`;
+    const castleEnd = `r${row}c${castleToCol}`;
+
+    rook.hasMoved = true;
+    return this.movePiece(castleStart, castleEnd, board);
   }
 
   renderBoard(board) {
