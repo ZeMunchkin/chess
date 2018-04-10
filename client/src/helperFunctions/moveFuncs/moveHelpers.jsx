@@ -4,33 +4,33 @@ const helpers = {
       return false;
     }
 
-    const startRow = Number(startLoc[1]);
-    const endRow = Number(endLoc[1]);
+    const startRow = Number(startLoc.slice(1, 2));
+    const endRow = Number(endLoc.slice(1, 2));
     if (startRow !== endRow) {
       return false;
     }
 
-    const color = team.toLowerCase() === 'white' ? 'w' : 'b';
-    const startCol = Number(startLoc[3]);
-    const endCol = Number(endLoc[3]);
+    const color = team.toLowerCase();
+    const startCol = Number(startLoc.slice(3));
+    const endCol = Number(endLoc.slice(3));
 
     if (startCol > endCol) {
       for (let i = startCol - 1; i >= endCol; i -= 1) {
         const curPiece = board[startRow][i];
-        if (curPiece && i !== endCol) {
+        if (curPiece.type && i !== endCol) {
           return false;
         }
-        if (curPiece && curPiece[0] === color) {
+        if (curPiece.color === color) {
           return false;
         }
       }
     } else {
       for (let i = startCol + 1; i <= endCol; i += 1) {
         const curPiece = board[startRow][i];
-        if (curPiece && i !== endCol) {
+        if (curPiece.type && i !== endCol) {
           return false;
         }
-        if (curPiece && curPiece[0] === color) {
+        if (curPiece.color === color) {
           return false;
         }
       }
@@ -43,32 +43,32 @@ const helpers = {
       return false;
     }
 
-    const startCol = Number(startLoc[3]);
-    const endCol = Number(endLoc[3]);
+    const startCol = Number(startLoc.slice(3));
+    const endCol = Number(endLoc.slice(3));
     if (startCol !== endCol) {
       return false;
     }
-    const color = team.toLowerCase() === 'white' ? 'w' : 'b';
-    const startRow = Number(startLoc[1]);
-    const endRow = Number(endLoc[1]);
+    const color = team.toLowerCase();
+    const startRow = Number(startLoc.slice(1, 2));
+    const endRow = Number(endLoc.slice(1, 2));
 
     if (startRow > endRow) {
       for (let i = startRow - 1; i >= endRow; i -= 1) {
         const curPiece = board[i][startCol];
-        if (curPiece && i !== endRow) {
+        if (curPiece.type && i !== endRow) {
           return false;
         }
-        if (curPiece && curPiece[0] === color) {
+        if (curPiece.color === color) {
           return false;
         }
       }
     } else {
       for (let i = startRow + 1; i <= endRow; i += 1) {
         const curPiece = board[i][startCol];
-        if (curPiece && i !== endRow) {
+        if (curPiece.type && i !== endRow) {
           return false;
         }
-        if (curPiece && curPiece[0] === color) {
+        if (curPiece.color === color) {
           return false;
         }
       }
@@ -82,23 +82,23 @@ const helpers = {
       return false;
     }
 
-    const startRow = Number(startLoc[1]);
-    const endRow = Number(endLoc[1]);
-    const startCol = Number(startLoc[3]);
-    const endCol = Number(endLoc[3]);
+    const startRow = Number(startLoc.slice(1, 2));
+    const endRow = Number(endLoc.slice(1, 2));
+    const startCol = Number(startLoc.slice(3));
+    const endCol = Number(endLoc.slice(3));
 
     if (startRow - endRow !== startCol - endCol) {
       return false;
     }
-    const color = team.toLowerCase() === 'white' ? 'w' : 'b';
+    const color = team.toLowerCase();
 
     if (startRow - endRow < 0) {
       const max = endRow - startRow;
       for (let i = 1; i <= max; i += 1) {
         const curPiece = board[startRow + i][startCol + i];
-        if (curPiece && startRow + i !== endRow) {
+        if (curPiece.type && startRow + i !== endRow) {
           return false;
-        } else if (curPiece && curPiece[0] === color) {
+        } else if (curPiece.color === color) {
           return false;
         }
       }
@@ -106,9 +106,9 @@ const helpers = {
       const max = startRow - endRow;
       for (let i = 1; i <= max; i += 1) {
         const curPiece = board[startRow - i][startCol - i];
-        if (curPiece && startRow - i !== endRow) {
+        if (curPiece.type && startRow - i !== endRow) {
           return false;
-        } else if (curPiece && curPiece[0] === color) {
+        } else if (curPiece.color === color) {
           return false;
         }
       }
@@ -122,23 +122,23 @@ const helpers = {
       return false;
     }
 
-    const startRow = Number(startLoc[1]);
-    const endRow = Number(endLoc[1]);
-    const startCol = Number(startLoc[3]);
-    const endCol = Number(endLoc[3]);
+    const startRow = Number(startLoc.slice(1, 2));
+    const endRow = Number(endLoc.slice(1, 2));
+    const startCol = Number(startLoc.slice(3));
+    const endCol = Number(endLoc.slice(3));
 
     if (startRow - endRow !== -(startCol - endCol)) {
       return false;
     }
-    const color = team.toLowerCase() === 'white' ? 'w' : 'b';
+    const color = team.toLowerCase();
 
     if (startRow - endRow < 0) {
       const max = endRow - startRow;
       for (let i = 1; i <= max; i += 1) {
         const curPiece = board[startRow + i][startCol - i];
-        if (curPiece && startRow + i !== endRow) {
+        if (curPiece.type && startRow + i !== endRow) {
           return false;
-        } else if (curPiece && curPiece[0] === color) {
+        } else if (curPiece.color === color) {
           return false;
         }
       }
@@ -146,9 +146,9 @@ const helpers = {
       const max = startRow - endRow;
       for (let i = 1; i <= max; i += 1) {
         const curPiece = board[startRow - i][startCol + i];
-        if (curPiece && startRow - i !== endRow) {
+        if (curPiece.type && startRow - i !== endRow) {
           return false;
-        } else if (curPiece && curPiece[0] === color) {
+        } else if (curPiece.color === color) {
           return false;
         }
       }

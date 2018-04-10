@@ -1,12 +1,12 @@
 const knightMove = (board, startLoc, endLoc, team) => {
-  const startRow = Number(startLoc[1]);
-  const endRow = Number(endLoc[1]);
-  const startCol = Number(startLoc[3]);
-  const endCol = Number(endLoc[3]);
+  const startRow = Number(startLoc.slice(1, 2));
+  const endRow = Number(endLoc.slice(1, 2));
+  const startCol = Number(startLoc.slice(3));
+  const endCol = Number(endLoc.slice(3));
 
   const color = team.toLowerCase() === 'white' ? 'w' : 'b';
   const curPiece = board[endRow][endCol];
-  if (curPiece && curPiece[0] === color) {
+  if (curPiece.type && curPiece.color === color) {
     return false;
   }
 
