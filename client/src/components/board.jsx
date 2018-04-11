@@ -36,29 +36,29 @@ class Board extends React.Component {
       ],
       turn: 'White',
       selectedPiece: null,
-      whiteKingLoc: 'r7c4',
-      blackKingLoc: 'r0c4',
+      whiteKing: null,
+      blackKing: null,
+      promotion: false,
       inCheck: '',
+      checkOrigination: null,
+      checkDisplay: false,
     };
     this.selectPiece = this.selectPiece.bind(this);
+    this.handlePromotionSelect = this.handlePromotionSelect.bind(this);
   }
 
-  movePiece(fromId, toId, boardParam) {
-    const board = boardParam || this.copyBoard();
-
-    const toRow = toId.slice(1, 2);
-    const toCol = toId.slice(3);
-    const fromRow = fromId.slice(1, 2);
-    const fromCol = fromId.slice(3);
-
-    const piece = board[fromRow][fromCol];
-    board[toRow][toCol] = piece;
-    board[fromRow][fromCol] = {};
-
-    return board;
+  componentDidMount() {
+    this.setState({ // eslint-disable-line
+      whiteKing: this.state.board[7][4],
+      blackKing: this.state.board[0][4],
+    });
   }
 
   selectPiece(event) {
+    if (this.state.promotion) {
+      return null;
+    }
+
     const classes = event.target.className.split(' ');
     const pieceLoc = this.state.selectedPiece;
     const pieceColor = classes[1];
@@ -68,7 +68,7 @@ class Board extends React.Component {
     if (pieceColor === this.state.turn.toLowerCase()) {
       const selected = endLoc;
       this.setState({ selectedPiece: selected });
-      return;
+      return null;
     }
 
     if (pieceLoc) {
@@ -89,31 +89,61 @@ class Board extends React.Component {
           piece.hasMoved = true;
         }
 
-        if (piece.type === 'king' && piece.color === 'white') {
-          this.setState({ whiteKingLoc: endLoc });
-        } else if (piece.type === 'king' && piece.color === 'black') {
-          this.setState({ blackKingLoc: endLoc });
+        const lastRow = piece.color === 'white' ? 0 : 7;
+        let promotion = false;
+        if (piece.type === 'pawn' && lastRow === Number(endLoc.slice(1, 2))) {
+          promotion = piece;
         }
 
-        let kingInCheck = '';
-        const opposingKing = piece.color === 'white' ? 'black' : 'white';
-        const opposingKingLoc = this.state[`${opposingKing}KingLoc`];
-        if (checkIfCheck(board, opposingKingLoc, opposingKing)) {
-          kingInCheck = opposingKing;
+        const kingInCheck = this.opposingKingInCheck(piece, board);
+        let checkOriginator;
+        if (kingInCheck) {
+          checkOriginator = piece;
         }
-        this.playTurn(board, kingInCheck);
+        this.playTurn(board, kingInCheck, promotion, checkOriginator);
       }
     }
+    return null;
   }
 
-  playTurn(board, inCheck) {
+  copyBoard() {
+    const curBoard = this.state.board;
+    const copiedBoard = [];
+    for (let key in curBoard) { // eslint-disable-line
+      copiedBoard[key] = curBoard[key].slice();
+    }
+    return copiedBoard;
+  }
+
+  movePiece(fromId, toId, boardParam) {
+    const board = boardParam || this.copyBoard();
+
+    const toRow = toId.slice(1, 2);
+    const toCol = toId.slice(3);
+    const fromRow = fromId.slice(1, 2);
+    const fromCol = fromId.slice(3);
+
+    const piece = board[fromRow][fromCol];
+    board[toRow][toCol] = piece;
+    board[fromRow][fromCol] = {};
+
+    return board;
+  }
+
+  playTurn(board, inCheck, promo, checkOrigin) {
+    const promotion = promo || false;
     const turn = this.state.turn === 'White' ? 'Black' : 'White';
+    const checkDisplay = !!inCheck;
     const selectedPiece = null;
+    const checkOriginator = checkOrigin || null;
     this.setState({
       board,
       turn,
       selectedPiece,
       inCheck,
+      promotion,
+      checkDisplay,
+      checkOriginator,
     });
   }
 
@@ -137,7 +167,7 @@ class Board extends React.Component {
       kingInCheck = checkIfCheck(board, endLoc, piece.color);
       changeKingPosition = false;
     } else {
-      const king = piece.color === 'white' ? this.state.whiteKingLoc : this.state.blackKingLoc;
+      const king = piece.color === 'white' ? this.state.whiteKing.loc : this.state.blackKing.loc;
       kingInCheck = checkIfCheck(board, king, piece.color);
     }
 
@@ -146,15 +176,6 @@ class Board extends React.Component {
     }
 
     return moveable;
-  }
-
-  copyBoard() {
-    const curBoard = this.state.board;
-    const copiedBoard = [];
-    for (let key in curBoard) { // eslint-disable-line
-      copiedBoard[key] = curBoard[key].slice();
-    }
-    return copiedBoard;
   }
 
   handleCastle(moveString, row, board) {
@@ -168,7 +189,99 @@ class Board extends React.Component {
     const castleEnd = `r${row}c${castleToCol}`;
 
     rook.hasMoved = true;
+    rook.loc = castleEnd;
     return this.movePiece(castleStart, castleEnd, board);
+  }
+
+  opposingKingInCheck(piece, board) {
+    let kingInCheck = '';
+    const opposingKingColor = piece.color === 'white' ? 'black' : 'white';
+    const opposingKingLoc = this.state[`${opposingKingColor}King`].loc;
+    if (checkIfCheck(board, opposingKingLoc, opposingKingColor)) {
+      kingInCheck = opposingKingColor;
+    }
+    return kingInCheck;
+  }
+
+  handlePromotionSelect(event) { // eslint-disable-line
+    const classes = event.target.className.split(' ');
+    const selection = classes[1];
+    const board = this.copyBoard();
+
+    const { loc, color } = this.state.promotion;
+    const row = loc.slice(1, 2);
+    const col = loc.slice(3);
+
+    switch (selection) {
+      case 'queen':
+        board[row][col] = new Queen(color, loc);
+        break;
+      case 'rook':
+        board[row][col] = new Rook(color, loc);
+        break;
+      case 'knight':
+        board[row][col] = new Knight(color, loc);
+        break;
+      case 'bishop':
+        board[row][col] = new Bishop(color, loc);
+        break;
+      default:
+        return null;
+    }
+    const promotion = false;
+    this.setState({
+      board,
+      promotion,
+    });
+  }
+
+  handlePromotionRender() {
+    const piece = this.state.promotion;
+    let queenImg, rookImg, knightImg, bishopImg; // eslint-disable-line
+
+    if (piece.color === 'white') {
+      queenImg = 'https://s3-us-west-1.amazonaws.com/chess-icons/whiteQueen.png';
+      rookImg = 'https://s3-us-west-1.amazonaws.com/chess-icons/whiteRook.png';
+      knightImg = 'https://s3-us-west-1.amazonaws.com/chess-icons/whiteKnight.png';
+      bishopImg = 'https://s3-us-west-1.amazonaws.com/chess-icons/whiteBishop.png';
+    } else {
+      queenImg = 'https://s3-us-west-1.amazonaws.com/chess-icons/blackQueen.png';
+      rookImg = 'https://s3-us-west-1.amazonaws.com/chess-icons/blackRook.png';
+      knightImg = 'https://s3-us-west-1.amazonaws.com/chess-icons/blackKnight.png';
+      bishopImg = 'https://s3-us-west-1.amazonaws.com/chess-icons/blackBishop.png';
+    }
+    return (
+      <div>
+        <button className="queen" onClick={this.handlePromotionSelect}>
+          <img
+            className="promoSelect queen"
+            alt={`${piece.color}-queen`}
+            src={queenImg}
+          />
+        </button>
+        <button className="rook" onClick={this.handlePromotionSelect}>
+          <img
+            className="promoSelect rook"
+            alt={`${piece.color}-rook`}
+            src={rookImg}
+          />
+        </button>
+        <button className="knight" onClick={this.handlePromotionSelect}>
+          <img
+            className="promoSelect knight"
+            alt={`${piece.color}-knight`}
+            src={knightImg}
+          />
+        </button>
+        <button className="bishop" onClick={this.handlePromotionSelect}>
+          <img
+            className="promoSelect bishop"
+            alt={`${piece.color}-bishop`}
+            src={bishopImg}
+          />
+        </button>
+      </div>
+    );
   }
 
   renderBoard(board) {
@@ -199,10 +312,37 @@ class Board extends React.Component {
     );
   }
 
+  renderHeaders() {
+    const { promotion } = this.state;
+    const check = this.state.checkDisplay;
+
+    if (promotion) {
+      return (
+        <div className="promotionContainer">
+          <h3>Select Pawn Promotion</h3>
+          {this.handlePromotionRender()}
+        </div>
+      );
+    }
+    if (check) {
+      setTimeout(() => {
+        this.setState({
+          checkDisplay: false,
+        });
+      }, 1500);
+      return (
+        <h1 id="title">Check!</h1>
+      );
+    }
+    return (
+      <h1 id="title">{`${this.state.turn}'s Move`}</h1>
+    );
+  }
+
   render() {
     return (
       <div id="appContainer">
-        <h1>{`${this.state.turn}'s Move`}</h1>
+        {this.renderHeaders()}
         <div id="boardContainer">
           {this.renderBoard(this.state.board)}
         </div>
