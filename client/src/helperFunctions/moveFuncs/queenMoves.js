@@ -1,18 +1,26 @@
 import helpers from './moveHelpers';
 
 const queenMove = (board, startLoc, endLoc, team) => {
-  if (helpers.byRow(board, startLoc, endLoc, team)) {
-    return true;
+  const rowPath = helpers.byRow(board, startLoc, endLoc, team);
+  if (rowPath) {
+    return rowPath;
   }
-  if (helpers.byCol(board, startLoc, endLoc, team)) {
-    return true;
+
+  const colPath = helpers.byCol(board, startLoc, endLoc, team);
+  if (colPath) {
+    return colPath;
   }
-  if (helpers.byMajorDiag(board, startLoc, endLoc, team)) {
-    return true;
+
+  const majorPath = helpers.byMajorDiag(board, startLoc, endLoc, team);
+  if (majorPath) {
+    return majorPath;
   }
-  if (helpers.byMinorDiag(board, startLoc, endLoc, team)) {
-    return true;
+
+  const minorPath = helpers.byMinorDiag(board, startLoc, endLoc, team);
+  if (minorPath) {
+    return minorPath;
   }
+
   return false;
 };
 

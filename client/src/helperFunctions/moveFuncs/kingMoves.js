@@ -49,7 +49,12 @@ const kingMove = (board, startLoc, endLoc, color) => {
   if (endPiece.color === color) {
     return false;
   }
-  return true;
+  const endsInCheck = (inCheck(board, endLoc, color));
+  if (endsInCheck) {
+    return false;
+  }
+  const path = [startLoc, endLoc];
+  return path;
 };
 
 export default kingMove;
