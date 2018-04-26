@@ -1,11 +1,14 @@
 import helpers from './moveHelpers';
 
 const bishopMove = (board, startLoc, endLoc, team) => {
-  if (helpers.byMajorDiag(board, startLoc, endLoc, team)) {
-    return true;
+  const majorPath = helpers.byMajorDiag(board, startLoc, endLoc, team);
+  if (majorPath) {
+    return majorPath;
   }
-  if (helpers.byMinorDiag(board, startLoc, endLoc, team)) {
-    return true;
+
+  const minorPath = helpers.byMinorDiag(board, startLoc, endLoc, team);
+  if (minorPath) {
+    return minorPath;
   }
   return false;
 };

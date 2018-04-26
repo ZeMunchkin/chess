@@ -1,5 +1,6 @@
 const helpers = {
   byRow: (board, startLoc, endLoc, team) => {
+    const path = [startLoc];
     if (startLoc === endLoc) {
       return false;
     }
@@ -16,6 +17,9 @@ const helpers = {
 
     if (startCol > endCol) {
       for (let i = startCol - 1; i >= endCol; i -= 1) {
+        const loc = `r${startRow}c${i}`;
+        path.push(loc);
+
         const curPiece = board[startRow][i];
         if (curPiece.type && i !== endCol) {
           return false;
@@ -26,6 +30,9 @@ const helpers = {
       }
     } else {
       for (let i = startCol + 1; i <= endCol; i += 1) {
+        const loc = `r${startRow}c${i}`;
+        path.push(loc);
+
         const curPiece = board[startRow][i];
         if (curPiece.type && i !== endCol) {
           return false;
@@ -35,10 +42,11 @@ const helpers = {
         }
       }
     }
-    return true;
+    return path;
   },
 
   byCol: (board, startLoc, endLoc, team) => {
+    const path = [startLoc];
     if (startLoc === endLoc) {
       return false;
     }
@@ -54,6 +62,9 @@ const helpers = {
 
     if (startRow > endRow) {
       for (let i = startRow - 1; i >= endRow; i -= 1) {
+        const loc = `r${i}c${startCol}`;
+        path.push(loc);
+
         const curPiece = board[i][startCol];
         if (curPiece.type && i !== endRow) {
           return false;
@@ -64,6 +75,9 @@ const helpers = {
       }
     } else {
       for (let i = startRow + 1; i <= endRow; i += 1) {
+        const loc = `r${i}c${startCol}`;
+        path.push(loc);
+
         const curPiece = board[i][startCol];
         if (curPiece.type && i !== endRow) {
           return false;
@@ -73,11 +87,12 @@ const helpers = {
         }
       }
     }
-    return true;
+    return path;
   },
 
   // go from tl to br
   byMajorDiag: (board, startLoc, endLoc, team) => {
+    const path = [startLoc];
     if (startLoc === endLoc) {
       return false;
     }
@@ -95,6 +110,9 @@ const helpers = {
     if (startRow - endRow < 0) {
       const max = endRow - startRow;
       for (let i = 1; i <= max; i += 1) {
+        const loc = `r${startRow + i}c${startCol + i}`;
+        path.push(loc);
+
         const curPiece = board[startRow + i][startCol + i];
         if (curPiece.type && startRow + i !== endRow) {
           return false;
@@ -105,6 +123,9 @@ const helpers = {
     } else {
       const max = startRow - endRow;
       for (let i = 1; i <= max; i += 1) {
+        const loc = `r${startRow - i}c${startCol - i}`;
+        path.push(loc);
+
         const curPiece = board[startRow - i][startCol - i];
         if (curPiece.type && startRow - i !== endRow) {
           return false;
@@ -113,11 +134,12 @@ const helpers = {
         }
       }
     }
-    return true;
+    return path;
   },
 
   // go from tr to bl
   byMinorDiag: (board, startLoc, endLoc, team) => {
+    const path = [startLoc];
     if (startLoc === endLoc) {
       return false;
     }
@@ -135,6 +157,9 @@ const helpers = {
     if (startRow - endRow < 0) {
       const max = endRow - startRow;
       for (let i = 1; i <= max; i += 1) {
+        const loc = `r${startRow + i}c${startCol - i}`;
+        path.push(loc);
+
         const curPiece = board[startRow + i][startCol - i];
         if (curPiece.type && startRow + i !== endRow) {
           return false;
@@ -145,6 +170,9 @@ const helpers = {
     } else {
       const max = startRow - endRow;
       for (let i = 1; i <= max; i += 1) {
+        const loc = `r${startRow - i}c${startCol + i}`;
+        path.push(loc);
+
         const curPiece = board[startRow - i][startCol + i];
         if (curPiece.type && startRow - i !== endRow) {
           return false;
@@ -153,7 +181,7 @@ const helpers = {
         }
       }
     }
-    return true;
+    return path;
   },
 };
 

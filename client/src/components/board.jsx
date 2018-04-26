@@ -40,8 +40,8 @@ class Board extends React.Component {
       blackKing: null,
       promotion: false,
       inCheck: '',
-      checkOrigination: null,
       checkDisplay: false,
+      // checkMate: false,
     };
     this.selectPiece = this.selectPiece.bind(this);
     this.handlePromotionSelect = this.handlePromotionSelect.bind(this);
@@ -55,7 +55,7 @@ class Board extends React.Component {
   }
 
   selectPiece(event) {
-    if (this.state.promotion) {
+    if (this.state.promotion || this.state.checkMate) {
       return null;
     }
 
@@ -95,12 +95,18 @@ class Board extends React.Component {
           promotion = piece;
         }
 
-        const kingInCheck = this.opposingKingInCheck(piece, board);
-        let checkOriginator;
-        if (kingInCheck) {
-          checkOriginator = piece;
-        }
-        this.playTurn(board, kingInCheck, promotion, checkOriginator);
+        const opposingCheck = this.opposingKingInCheck(piece, board);
+
+        const { kingInCheck } = opposingCheck;
+        // const { kingInCheck, checkOriginationPaths } = opposingCheck;
+        // let checkMate = false;
+        // const opposingKing = piece.Color === 'white' ? this.state.blackKing : this.state.whiteKing;
+        // if (kingInCheck) {
+        //   checkMate = this.checkForCheckmate(board, opposingKing, checkOriginationPaths);
+        //   console.log(checkMate);
+        // }
+        // this.playTurn(board, kingInCheck, promotion, checkMate);
+        this.playTurn(board, kingInCheck, promotion);
       }
     }
     return null;
@@ -130,12 +136,11 @@ class Board extends React.Component {
     return board;
   }
 
-  playTurn(board, inCheck, promo, checkOrigin) {
+  playTurn(board, inCheck, promo, checkMate) {
     const promotion = promo || false;
     const turn = this.state.turn === 'White' ? 'Black' : 'White';
     const checkDisplay = !!inCheck;
     const selectedPiece = null;
-    const checkOriginator = checkOrigin || null;
     this.setState({
       board,
       turn,
@@ -143,7 +148,7 @@ class Board extends React.Component {
       inCheck,
       promotion,
       checkDisplay,
-      checkOriginator,
+      checkMate,
     });
   }
 
@@ -194,14 +199,76 @@ class Board extends React.Component {
   }
 
   opposingKingInCheck(piece, board) {
-    let kingInCheck = '';
     const opposingKingColor = piece.color === 'white' ? 'black' : 'white';
-    const opposingKingLoc = this.state[`${opposingKingColor}King`].loc;
-    if (checkIfCheck(board, opposingKingLoc, opposingKingColor)) {
-      kingInCheck = opposingKingColor;
+    const opposingKing = this.state[`${opposingKingColor}King`];
+    const opposingKingLoc = opposingKing.loc;
+    const checkPaths = checkIfCheck(board, opposingKingLoc, opposingKingColor);
+
+    if (checkPaths) {
+      return {
+        kingInCheck: opposingKingColor,
+        checkOriginationPaths: checkPaths,
+      };
     }
-    return kingInCheck;
+    return { kingInCheck: '' };
   }
+
+  // checkForCheckmate(board, king, paths) { // eslint-disable-line
+  //   // can the king move anywhere
+  //   const startLoc = king.loc;
+  //   const startRow = Number(startLoc.slice(1, 2));
+  //   const startCol = Number(startLoc.slice(3));
+
+  //   const locChanges = [-1, 0, 1];
+  //   for (let i = 0; i < locChanges.length; i += 1) {
+  //     const rowIndex = startRow + locChanges[i];
+  //     if (rowIndex >= 0 && rowIndex <= 7) {
+  //       for (let j = 0; j < locChanges.length; i += 1) {
+  //         const colIndex = startCol + locChanges[i];
+  //         if (colIndex >= 0 && colIndex <= 7) {
+  //           const endLoc = `r${rowIndex}c${colIndex}`;
+  //           console.log(endLoc);
+  //           if (king.move(board, endLoc)) {
+  //             console.log(board);
+  //             console.log('it is failing in the king can move');
+  //             return false;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   // can any other piece move to protect the king?
+  //   const numPaths = paths.length;
+
+  //   // iterate through the board
+  //   for (let i = 0; i < board.length; i += 1) {
+  //     const curRow = board[i];
+  //     for (let j = 0; j < curRow.length; j += 1) {
+  //       const curPiece = curRow[j];
+  //       if (curPiece.color === king.color) {
+  //         let numPathsDefeated = 0;
+
+  //         // iterate through all paths to see if can move to any spot
+  //         for (let k = 0; k < paths.length; k += 1) {
+  //           const curPath = paths[k];
+  //           for (let l = 0; l < curPath.length; l += 1) {
+  //             const loc = curPath[l];
+  //             if (curPiece.move(board, loc)) {
+  //               numPathsDefeated += 1;
+  //               if (numPathsDefeated === numPaths) {
+  //                 console.log('it is failing in the pieces can move');
+  //                 return false;
+  //               }
+  //               break;
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return true;
+  // }
 
   handlePromotionSelect(event) { // eslint-disable-line
     const classes = event.target.className.split(' ');
@@ -228,10 +295,26 @@ class Board extends React.Component {
       default:
         return null;
     }
+
+    const opposingKingColor = color === 'white' ? 'black' : 'white';
+    let inCheck = '';
+    const kingInCheck = checkIfCheck(board, this.state[`${opposingKingColor}King`].loc, opposingKingColor);
+    let checkOriginator = null;
+
+    if (kingInCheck) {
+      inCheck = opposingKingColor;
+      checkOriginator = board[row][col];
+    }
+
     const promotion = false;
+    const checkDisplay = !!kingInCheck;
+
     this.setState({
       board,
       promotion,
+      inCheck,
+      checkDisplay,
+      checkOriginator,
     });
   }
 
@@ -313,8 +396,14 @@ class Board extends React.Component {
   }
 
   renderHeaders() {
-    const { promotion } = this.state;
+    const { promotion, checkMate } = this.state;
     const check = this.state.checkDisplay;
+
+    if (checkMate) {
+      return (
+        <h1 id="title">Checkmate!</h1>
+      );
+    }
 
     if (promotion) {
       return (
