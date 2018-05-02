@@ -1,3 +1,4 @@
 node_modules
 client/public/bundle.js
 client/src/helperFunctions/.DS_Store
+client/src/helperFunctions/moveFuncs/.DS_Store

@@ -1,4 +1,6 @@
-import inCheck from './inCheck';
+import inCheck from '../boardHelpers/inCheck';
+import copyBoard from '../boardHelpers/copyBoard';
+import movePiece from '../boardHelpers/movePiece';
 
 const kingMove = (board, startLoc, endLoc, color) => {
   const startRow = Number(startLoc.slice(1, 2));
@@ -49,7 +51,8 @@ const kingMove = (board, startLoc, endLoc, color) => {
   if (endPiece.color === color) {
     return false;
   }
-  const endsInCheck = (inCheck(board, endLoc, color));
+  const movedBoard = movePiece(startLoc, endLoc, copyBoard(board));
+  const endsInCheck = (inCheck(movedBoard, endLoc, color));
   if (endsInCheck) {
     return false;
   }
