@@ -1,12 +1,8 @@
-import copyBoard from './copyBoard';
+const checkForCheckmate = (board, king, paths) => { // eslint-disable-line
+  const startRow = Number(king.loc.slice(1, 2));
+  const startCol = Number(king.loc.slice(3));
 
-const checkForCheckmate = (originalBoard, king, paths) => { // eslint-disable-line
   // can the king move anywhere
-  const board = copyBoard(originalBoard);
-  const startLoc = king.loc;
-  const startRow = Number(startLoc.slice(1, 2));
-  const startCol = Number(startLoc.slice(3));
-
   const locChanges = [-1, 0, 1];
   for (let i = 0; i < locChanges.length; i += 1) {
     const rowIndex = startRow + locChanges[i];
@@ -24,7 +20,6 @@ const checkForCheckmate = (originalBoard, king, paths) => { // eslint-disable-li
   }
 
   // can any other piece move to protect the king?
-
   const numPaths = paths.length;
 
   if (numPaths > 1) {
@@ -34,21 +29,21 @@ const checkForCheckmate = (originalBoard, king, paths) => { // eslint-disable-li
 
     for (let i = 0; i < firstPath.length; i += 1) {
       const curLoc = firstPath[i];
-      if (secondPath.contains(curLoc)) {
+      if (secondPath.includes(curLoc)) {
         intersection = curLoc;
         break;
       }
     }
 
-    if (!intersection) {
-      return true;
+    if (!intersection || intersection === king.loc) {
+      return paths;
     }
 
     if (numPaths > 2) {
       for (let i = 2; i < numPaths; i += 1) {
         const curPath = paths[i];
-        if (!curPath.contains(intersection)) {
-          return true;
+        if (!curPath.includes(intersection)) {
+          return paths;
         }
       }
     }
@@ -84,7 +79,7 @@ const checkForCheckmate = (originalBoard, king, paths) => { // eslint-disable-li
     }
   }
 
-  return true;
+  return paths;
 };
 
 export default checkForCheckmate;

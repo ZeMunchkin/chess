@@ -1,59 +1,29 @@
 import React from 'react';
 
 import Square from './square';
-import King from '../helperFunctions/pieceClasses/kingPiece';
 import Queen from '../helperFunctions/pieceClasses/queenPiece';
 import Rook from '../helperFunctions/pieceClasses/rookPiece';
 import Knight from '../helperFunctions/pieceClasses/knightPiece';
 import Bishop from '../helperFunctions/pieceClasses/bishopPiece';
-import Pawn from '../helperFunctions/pieceClasses/pawnPiece';
 
+import createState from '../helperFunctions/boardHelpers/createState';
 import copyBoard from '../helperFunctions/boardHelpers/copyBoard';
 import checkIfCheck from '../helperFunctions/boardHelpers/inCheck';
 import movePiece from '../helperFunctions/boardHelpers/movePiece';
 import handleCastle from '../helperFunctions/boardHelpers/handleCastle';
 import checkValidMove from '../helperFunctions/boardHelpers/checkValidMove';
+import opposingKingInCheck from '../helperFunctions/boardHelpers/opposingKingInCheck';
 import checkForCheckmate from '../helperFunctions/boardHelpers/checkMate';
 
 
 class Board extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      board: [
-        [
-          new Rook('black', 'r0c0'), new Knight('black', 'r0c1'), new Bishop('black', 'r0c2'), new Queen('black', 'r0c3'),
-          new King('black', 'r0c4'), new Bishop('black', 'r0c5'), new Knight('black', 'r0c6'), new Rook('black', 'r0c7'),
-        ],
-        [
-          new Pawn('black', 'r1c0'), new Pawn('black', 'r1c1'), new Pawn('black', 'r1c2'), new Pawn('black', 'r1c3'),
-          new Pawn('black', 'r1c4'), new Pawn('black', 'r1c5'), new Pawn('black', 'r1c6'), new Pawn('black', 'r1c7'),
-        ],
-        [{}, {}, {}, {}, {}, {}, {}, {}],
-        [{}, {}, {}, {}, {}, {}, {}, {}],
-        [{}, {}, {}, {}, {}, {}, {}, {}],
-        [{}, {}, {}, {}, {}, {}, {}, {}],
-        [
-          new Pawn('white', 'r6c0'), new Pawn('white', 'r6c1'), new Pawn('white', 'r6c2'), new Pawn('white', 'r6c3'),
-          new Pawn('white', 'r6c4'), new Pawn('white', 'r6c5'), new Pawn('white', 'r6c6'), new Pawn('white', 'r6c7'),
-        ],
-        [
-          new Rook('white', 'r7c0'), new Knight('white', 'r7c1'), new Bishop('white', 'r7c2'), new Queen('white', 'r7c3'),
-          new King('white', 'r7c4'), new Bishop('white', 'r7c5'), new Knight('white', 'r7c6'), new Rook('white', 'r7c7'),
-        ],
-      ],
-      turn: 'White',
-      selectedPiece: null,
-      whiteKing: null,
-      blackKing: null,
-      promotion: false,
-      inCheck: '',
-      checkDisplay: false,
-      checkMate: false,
-    };
+    this.state = createState();
     this.selectPiece = this.selectPiece.bind(this);
     this.handlePromotionSelect = this.handlePromotionSelect.bind(this);
   }
+
 
   componentDidMount() {
     this.setState({ // eslint-disable-line
@@ -61,6 +31,12 @@ class Board extends React.Component {
       blackKing: this.state.board[0][4],
     });
   }
+
+
+  newGame() {
+    this.setState(createState());
+  }
+
 
   selectPiece(event) {
     if (this.state.promotion || this.state.checkMate) {
@@ -73,12 +49,14 @@ class Board extends React.Component {
     const endLoc = event.target.id;
     let moveable;
 
+    // set selected piece
     if (pieceColor === this.state.turn.toLowerCase()) {
       const selected = endLoc;
       this.setState({ selectedPiece: selected });
       return null;
     }
 
+    // move piece already selected
     if (pieceLoc) {
       moveable = checkValidMove(
         endLoc, this.state.selectedPiece, copyBoard(this.state.board),
@@ -106,21 +84,24 @@ class Board extends React.Component {
           promotion = piece;
         }
 
-        const opposingCheck = this.opposingKingInCheck(piece, board);
+        const opposingCheck = opposingKingInCheck(piece, board, this);
 
         const { kingInCheck, checkOriginationPaths } = opposingCheck;
         let checkMate = false;
+        let checkMatePaths = [];
         const opposingKing = piece.color === 'white' ? this.state.blackKing : this.state.whiteKing;
         if (kingInCheck) {
-          checkMate = checkForCheckmate(board, opposingKing, checkOriginationPaths);
+          checkMatePaths = checkForCheckmate(board, opposingKing, checkOriginationPaths);
+          checkMate = !!checkMatePaths;
         }
-        this.playTurn(board, kingInCheck, promotion, checkMate);
+        this.playTurn(board, kingInCheck, promotion, checkMate, checkMatePaths);
       }
     }
     return null;
   }
 
-  playTurn(board, inCheck, promo, checkMate) {
+
+  playTurn(board, inCheck, promo, checkMate, checkMatePaths) {
     const promotion = promo || false;
     const turn = this.state.turn === 'White' ? 'Black' : 'White';
     const checkDisplay = !!inCheck;
@@ -133,23 +114,10 @@ class Board extends React.Component {
       promotion,
       checkDisplay,
       checkMate,
+      checkMatePaths,
     });
   }
 
-  opposingKingInCheck(piece, board) {
-    const opposingKingColor = piece.color === 'white' ? 'black' : 'white';
-    const opposingKing = this.state[`${opposingKingColor}King`];
-    const opposingKingLoc = opposingKing.loc;
-    const checkPaths = checkIfCheck(board, opposingKingLoc, opposingKingColor);
-
-    if (checkPaths) {
-      return {
-        kingInCheck: opposingKingColor,
-        checkOriginationPaths: checkPaths,
-      };
-    }
-    return { kingInCheck: '' };
-  }
 
   handlePromotionSelect(event) { // eslint-disable-line
     const classes = event.target.className.split(' ');
@@ -195,6 +163,7 @@ class Board extends React.Component {
       checkDisplay,
     });
   }
+
 
   handlePromotionRender() {
     const piece = this.state.promotion;
@@ -245,12 +214,25 @@ class Board extends React.Component {
     );
   }
 
+
   renderBoard(board) {
     const returnShaded = (row, col) => {
       if (row % 2 === 0 && col % 2 !== 0) {
         return true;
       } else if (row % 2 !== 0 && col % 2 === 0) {
         return true;
+      }
+      return false;
+    };
+
+    const returnCheckMatePath = (row, col) => {
+      const loc = `r${row}c${col}`;
+      const paths = this.state.checkMatePaths;
+      for (let i = 0; i < paths.length; i += 1) {
+        const curPath = paths[i];
+        if (curPath.includes(loc)) {
+          return true;
+        }
       }
       return false;
     };
@@ -265,6 +247,7 @@ class Board extends React.Component {
               select={this.selectPiece}
               shaded={returnShaded(rowIndex, colIndex)}
               selected={this.state.selectedPiece}
+              checkMatePath={returnCheckMatePath(rowIndex, colIndex)}
               key={`r${rowIndex}c${colIndex}`} /* eslint-disable-line */
             />
           ))}
@@ -272,6 +255,7 @@ class Board extends React.Component {
       ))
     );
   }
+
 
   renderHeaders() {
     const { promotion, checkMate } = this.state;
@@ -305,6 +289,7 @@ class Board extends React.Component {
       <h1 id="title">{`${this.state.turn}'s Move`}</h1>
     );
   }
+
 
   render() {
     return (

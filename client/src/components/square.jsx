@@ -6,11 +6,15 @@ import render from '../helperFunctions/renderHelpers';
 const Square = (props) => {
   let classes = 'square';
   if (props.shaded) {
-    classes = 'square shaded';
+    classes += ' shaded';
   }
   if (props.selected === props.loc) {
     classes += ' selected';
   }
+  if (props.checkMatePath) {
+    classes += ' checkMatePath';
+  }
+
   return (
     <div id={props.loc} className={classes} onClick={props.select}> {/*eslint-disable-line*/}
       {render(props.piece, props.loc)}
@@ -28,6 +32,7 @@ Square.propTypes = {
   }),
   select: propTypes.func.isRequired,
   shaded: propTypes.bool.isRequired,
+  checkMatePath: propTypes.bool.isRequired,
   selected: propTypes.string,
 };
 
