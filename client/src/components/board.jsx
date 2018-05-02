@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Square from './square';
 import King from '../helperFunctions/pieceClasses/kingPiece';
 import Queen from '../helperFunctions/pieceClasses/queenPiece';
@@ -6,7 +7,14 @@ import Rook from '../helperFunctions/pieceClasses/rookPiece';
 import Knight from '../helperFunctions/pieceClasses/knightPiece';
 import Bishop from '../helperFunctions/pieceClasses/bishopPiece';
 import Pawn from '../helperFunctions/pieceClasses/pawnPiece';
-import checkIfCheck from '../helperFunctions/moveFuncs/inCheck';
+
+import copyBoard from '../helperFunctions/boardHelpers/copyBoard';
+import checkIfCheck from '../helperFunctions/boardHelpers/inCheck';
+import movePiece from '../helperFunctions/boardHelpers/movePiece';
+import handleCastle from '../helperFunctions/boardHelpers/handleCastle';
+import checkValidMove from '../helperFunctions/boardHelpers/checkValidMove';
+import checkForCheckmate from '../helperFunctions/boardHelpers/checkMate';
+
 
 class Board extends React.Component {
   constructor(props) {
@@ -41,7 +49,7 @@ class Board extends React.Component {
       promotion: false,
       inCheck: '',
       checkDisplay: false,
-      // checkMate: false,
+      checkMate: false,
     };
     this.selectPiece = this.selectPiece.bind(this);
     this.handlePromotionSelect = this.handlePromotionSelect.bind(this);
@@ -72,17 +80,20 @@ class Board extends React.Component {
     }
 
     if (pieceLoc) {
-      moveable = this.checkValidMove(endLoc);
+      moveable = checkValidMove(
+        endLoc, this.state.selectedPiece, copyBoard(this.state.board),
+        this.state.whiteKing, this.state.blackKing,
+      );
 
       if (moveable) {
         const pieceRow = pieceLoc.slice(1, 2);
         const pieceCol = pieceLoc.slice(3);
         const piece = this.state.board[pieceRow][pieceCol];
-        let board = this.movePiece(pieceLoc, endLoc);
+        let board = movePiece(pieceLoc, endLoc, copyBoard(this.state.board));
         piece.loc = endLoc;
 
         if (typeof moveable === 'string') {
-          board = this.handleCastle(moveable, pieceRow, board);
+          board = handleCastle(moveable, pieceRow, board);
         }
 
         if (piece.type === 'rook' || piece.type === 'king') {
@@ -97,43 +108,16 @@ class Board extends React.Component {
 
         const opposingCheck = this.opposingKingInCheck(piece, board);
 
-        const { kingInCheck } = opposingCheck;
-        // const { kingInCheck, checkOriginationPaths } = opposingCheck;
-        // let checkMate = false;
-        // const opposingKing = piece.Color === 'white' ? this.state.blackKing : this.state.whiteKing;
-        // if (kingInCheck) {
-        //   checkMate = this.checkForCheckmate(board, opposingKing, checkOriginationPaths);
-        //   console.log(checkMate);
-        // }
-        // this.playTurn(board, kingInCheck, promotion, checkMate);
-        this.playTurn(board, kingInCheck, promotion);
+        const { kingInCheck, checkOriginationPaths } = opposingCheck;
+        let checkMate = false;
+        const opposingKing = piece.color === 'white' ? this.state.blackKing : this.state.whiteKing;
+        if (kingInCheck) {
+          checkMate = checkForCheckmate(board, opposingKing, checkOriginationPaths);
+        }
+        this.playTurn(board, kingInCheck, promotion, checkMate);
       }
     }
     return null;
-  }
-
-  copyBoard() {
-    const curBoard = this.state.board;
-    const copiedBoard = [];
-    for (let key in curBoard) { // eslint-disable-line
-      copiedBoard[key] = curBoard[key].slice();
-    }
-    return copiedBoard;
-  }
-
-  movePiece(fromId, toId, boardParam) {
-    const board = boardParam || this.copyBoard();
-
-    const toRow = toId.slice(1, 2);
-    const toCol = toId.slice(3);
-    const fromRow = fromId.slice(1, 2);
-    const fromCol = fromId.slice(3);
-
-    const piece = board[fromRow][fromCol];
-    board[toRow][toCol] = piece;
-    board[fromRow][fromCol] = {};
-
-    return board;
   }
 
   playTurn(board, inCheck, promo, checkMate) {
@@ -152,52 +136,6 @@ class Board extends React.Component {
     });
   }
 
-  checkValidMove(endLoc) {
-    const pieceLoc = this.state.selectedPiece;
-    const pieceRow = pieceLoc.slice(1, 2);
-    const pieceCol = pieceLoc.slice(3);
-    let board = this.copyBoard();
-    const piece = board[pieceRow][pieceCol];
-    let changeKingPosition = piece.type === 'king';
-    let kingInCheck;
-
-    let moveable = piece.move(board, endLoc);
-
-    if (!moveable) {
-      return false;
-    }
-
-    board = this.movePiece(pieceLoc, endLoc);
-    if (changeKingPosition) {
-      kingInCheck = checkIfCheck(board, endLoc, piece.color);
-      changeKingPosition = false;
-    } else {
-      const king = piece.color === 'white' ? this.state.whiteKing.loc : this.state.blackKing.loc;
-      kingInCheck = checkIfCheck(board, king, piece.color);
-    }
-
-    if (kingInCheck) {
-      moveable = false;
-    }
-
-    return moveable;
-  }
-
-  handleCastle(moveString, row, board) {
-    let castleDirection = moveString.split(' ');
-    castleDirection = castleDirection[1]; // eslint-disable-line
-
-    const castleFromCol = castleDirection === 'left' ? 0 : 7;
-    const castleToCol = castleDirection === 'left' ? 3 : 5;
-    const rook = board[row][castleFromCol];
-    const castleStart = `r${row}c${castleFromCol}`;
-    const castleEnd = `r${row}c${castleToCol}`;
-
-    rook.hasMoved = true;
-    rook.loc = castleEnd;
-    return this.movePiece(castleStart, castleEnd, board);
-  }
-
   opposingKingInCheck(piece, board) {
     const opposingKingColor = piece.color === 'white' ? 'black' : 'white';
     const opposingKing = this.state[`${opposingKingColor}King`];
@@ -213,67 +151,10 @@ class Board extends React.Component {
     return { kingInCheck: '' };
   }
 
-  // checkForCheckmate(board, king, paths) { // eslint-disable-line
-  //   // can the king move anywhere
-  //   const startLoc = king.loc;
-  //   const startRow = Number(startLoc.slice(1, 2));
-  //   const startCol = Number(startLoc.slice(3));
-
-  //   const locChanges = [-1, 0, 1];
-  //   for (let i = 0; i < locChanges.length; i += 1) {
-  //     const rowIndex = startRow + locChanges[i];
-  //     if (rowIndex >= 0 && rowIndex <= 7) {
-  //       for (let j = 0; j < locChanges.length; i += 1) {
-  //         const colIndex = startCol + locChanges[i];
-  //         if (colIndex >= 0 && colIndex <= 7) {
-  //           const endLoc = `r${rowIndex}c${colIndex}`;
-  //           console.log(endLoc);
-  //           if (king.move(board, endLoc)) {
-  //             console.log(board);
-  //             console.log('it is failing in the king can move');
-  //             return false;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   // can any other piece move to protect the king?
-  //   const numPaths = paths.length;
-
-  //   // iterate through the board
-  //   for (let i = 0; i < board.length; i += 1) {
-  //     const curRow = board[i];
-  //     for (let j = 0; j < curRow.length; j += 1) {
-  //       const curPiece = curRow[j];
-  //       if (curPiece.color === king.color) {
-  //         let numPathsDefeated = 0;
-
-  //         // iterate through all paths to see if can move to any spot
-  //         for (let k = 0; k < paths.length; k += 1) {
-  //           const curPath = paths[k];
-  //           for (let l = 0; l < curPath.length; l += 1) {
-  //             const loc = curPath[l];
-  //             if (curPiece.move(board, loc)) {
-  //               numPathsDefeated += 1;
-  //               if (numPathsDefeated === numPaths) {
-  //                 console.log('it is failing in the pieces can move');
-  //                 return false;
-  //               }
-  //               break;
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return true;
-  // }
-
   handlePromotionSelect(event) { // eslint-disable-line
     const classes = event.target.className.split(' ');
     const selection = classes[1];
-    const board = this.copyBoard();
+    const board = copyBoard(this.state.board);
 
     const { loc, color } = this.state.promotion;
     const row = loc.slice(1, 2);
@@ -299,11 +180,9 @@ class Board extends React.Component {
     const opposingKingColor = color === 'white' ? 'black' : 'white';
     let inCheck = '';
     const kingInCheck = checkIfCheck(board, this.state[`${opposingKingColor}King`].loc, opposingKingColor);
-    let checkOriginator = null;
 
     if (kingInCheck) {
       inCheck = opposingKingColor;
-      checkOriginator = board[row][col];
     }
 
     const promotion = false;
@@ -314,7 +193,6 @@ class Board extends React.Component {
       promotion,
       inCheck,
       checkDisplay,
-      checkOriginator,
     });
   }
 

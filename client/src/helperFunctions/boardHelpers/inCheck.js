@@ -1,5 +1,4 @@
 const inCheck = (board, kingLoc, kingTeam) => {
-  // const opposingColor = kingTeam.toLowerCase() === 'white' ? 'black' : 'white';
   const allPaths = [];
 
   for (let i = 0; i < board.length; i += 1) {
@@ -16,6 +15,9 @@ const inCheck = (board, kingLoc, kingTeam) => {
   }
 
   if (allPaths.length > 0) {
+    for (let i = 0; i < allPaths.length; i += 1) {
+      allPaths[i].pop();
+    }
     return allPaths;
   }
 
