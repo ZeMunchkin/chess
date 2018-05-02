@@ -15,9 +15,6 @@ const inCheck = (board, kingLoc, kingTeam) => {
   }
 
   if (allPaths.length > 0) {
-    for (let i = 0; i < allPaths.length; i += 1) {
-      allPaths[i].pop();
-    }
     return allPaths;
   }
 
