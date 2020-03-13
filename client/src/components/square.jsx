@@ -1,7 +1,7 @@
 import React from 'react';
 import propTypes from 'proptypes';
 
-import render from '../helperFunctions/renderHelpers';
+import render from '../utils/renderHelpers';
 
 const Square = (props) => {
   let classes = 'square';
