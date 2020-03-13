@@ -1,5 +1,5 @@
 import React from 'react';
-import propTypes from 'proptypes';
+import PropTypes from 'prop-types';
 
 const images = {
   black: 'https://s3-us-west-1.amazonaws.com/chess-icons/blackBishop.png',
@@ -18,6 +18,6 @@ const Bishop = props => (
 export default Bishop;
 
 Bishop.propTypes = {
-  color: propTypes.string.isRequired,
-  loc: propTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  loc: PropTypes.string.isRequired,
 };

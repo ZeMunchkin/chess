@@ -1,5 +1,5 @@
 import React from 'react';
-import propTypes from 'proptypes';
+import PropTypes from 'prop-types';
 
 import render from '../../utils/renderHelpers';
 
@@ -25,15 +25,15 @@ const Square = (props) => {
 export default Square;
 
 Square.propTypes = {
-  loc: propTypes.string.isRequired,
-  piece: propTypes.shape({
-    color: propTypes.string,
-    type: propTypes.string,
+  loc: PropTypes.string.isRequired,
+  piece: PropTypes.shape({
+    color: PropTypes.string,
+    type: PropTypes.string,
   }),
-  select: propTypes.func.isRequired,
-  shaded: propTypes.bool.isRequired,
-  checkMatePath: propTypes.bool.isRequired,
-  selected: propTypes.string,
+  select: PropTypes.func.isRequired,
+  shaded: PropTypes.bool.isRequired,
+  checkMatePath: PropTypes.bool.isRequired,
+  selected: PropTypes.string,
 };
 
 Square.defaultProps = {

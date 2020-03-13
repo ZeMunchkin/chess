@@ -43,6 +43,7 @@ export default [
     team: BLACK_TEAM,
     row: 0,
     column: 4,
+    hasMoved: false,
     inCheck: false,
   },
   {
@@ -231,6 +232,7 @@ export default [
     team: WHITE_TEAM,
     row: 7,
     column: 4,
+    hasMoved: false,
     inCheck: false,
   },
   {
