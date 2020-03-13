@@ -1,19 +1,19 @@
 import React from 'react';
 
-import Square from './square';
-import Queen from '../utils/pieceClasses/queenPiece';
-import Rook from '../utils/pieceClasses/rookPiece';
-import Knight from '../utils/pieceClasses/knightPiece';
-import Bishop from '../utils/pieceClasses/bishopPiece';
+import Square from '../square/index';
+import Queen from '../../utils/pieceClasses/queenPiece';
+import Rook from '../../utils/pieceClasses/rookPiece';
+import Knight from '../../utils/pieceClasses/knightPiece';
+import Bishop from '../../utils/pieceClasses/bishopPiece';
 
-import createState from '../utils/boardHelpers/createState';
-import copyBoard from '../utils/boardHelpers/copyBoard';
-import checkIfCheck from '../utils/boardHelpers/inCheck';
-import movePiece from '../utils/boardHelpers/movePiece';
-import handleCastle from '../utils/boardHelpers/handleCastle';
-import checkValidMove from '../utils/boardHelpers/checkValidMove';
-import opposingKingInCheck from '../utils/boardHelpers/opposingKingInCheck';
-import checkForCheckmate from '../utils/boardHelpers/checkMate';
+import createState from '../../utils/boardHelpers/createState';
+import copyBoard from '../../utils/boardHelpers/copyBoard';
+import checkIfCheck from '../../utils/boardHelpers/inCheck';
+import movePiece from '../../utils/boardHelpers/movePiece';
+import handleCastle from '../../utils/boardHelpers/handleCastle';
+import checkValidMove from '../../utils/boardHelpers/checkValidMove';
+import opposingKingInCheck from '../../utils/boardHelpers/opposingKingInCheck';
+import checkForCheckmate from '../../utils/boardHelpers/checkMate';
 
 
 class Board extends React.Component {

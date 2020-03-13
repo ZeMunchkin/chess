@@ -1,11 +1,11 @@
 import React from 'react';
 
-import PawnClass from '../components/pawnClass';
-import BishopClass from '../components/bishopClass';
-import KnightClass from '../components/knightClass';
-import RookClass from '../components/rookClass';
-import QueenClass from '../components/queenClass';
-import KingClass from '../components/kingClass';
+import Pawn from '../components/pawn/index';
+import Bishop from '../components/bishop/index';
+import Knight from '../components/knight/index';
+import Rook from '../components/rook/index';
+import Queen from '../components/queen/index';
+import King from '../components/king/index';
 
 const renderPiece = (piece, location) => {
   if (!piece) {
@@ -16,17 +16,17 @@ const renderPiece = (piece, location) => {
 
   switch (piece.type) {
     case 'pawn':
-      return (<PawnClass color={color} loc={location} />);
+      return (<Pawn color={color} loc={location} />);
     case 'rook':
-      return (<RookClass color={color} loc={location} />);
+      return (<Rook color={color} loc={location} />);
     case 'knight':
-      return (<KnightClass color={color} loc={location} />);
+      return (<Knight color={color} loc={location} />);
     case 'bishop':
-      return (<BishopClass color={color} loc={location} />);
+      return (<Bishop color={color} loc={location} />);
     case 'queen':
-      return (<QueenClass color={color} loc={location} />);
+      return (<Queen color={color} loc={location} />);
     case 'king':
-      return (<KingClass color={color} loc={location} />);
+      return (<King color={color} loc={location} />);
     default:
       return (null);
   }
