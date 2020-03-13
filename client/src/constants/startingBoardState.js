@@ -1,12 +1,13 @@
 import {
+  WHITE_TEAM,
+  BLACK_TEAM,
   BISHOP,
   KING,
   KNIGHT,
   PAWN,
   QUEEN,
   ROOK,
-} from './pieceTypes';
-import { BLACK_TEAM, WHITE_TEAM } from './teams';
+} from './index';
 
 export default [
   {
