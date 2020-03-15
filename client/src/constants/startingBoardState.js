@@ -12,7 +12,7 @@ import {
 export default [
   {
     id: 1,
-    pieceType: ROOK,
+    type: ROOK,
     team: BLACK_TEAM,
     row: 0,
     column: 0,
@@ -20,28 +20,28 @@ export default [
   },
   {
     id: 2,
-    pieceType: KNIGHT,
+    type: KNIGHT,
     team: BLACK_TEAM,
     row: 0,
     column: 1,
   },
   {
     id: 3,
-    pieceType: BISHOP,
+    type: BISHOP,
     team: BLACK_TEAM,
     row: 0,
     column: 2,
   },
   {
     id: 4,
-    pieceType: QUEEN,
+    type: QUEEN,
     team: BLACK_TEAM,
     row: 0,
     column: 3,
   },
   {
     id: 5,
-    pieceType: KING,
+    type: KING,
     team: BLACK_TEAM,
     row: 0,
     column: 4,
@@ -50,21 +50,21 @@ export default [
   },
   {
     id: 6,
-    pieceType: BISHOP,
+    type: BISHOP,
     team: BLACK_TEAM,
     row: 0,
     column: 5,
   },
   {
     id: 7,
-    pieceType: KNIGHT,
+    type: KNIGHT,
     team: BLACK_TEAM,
     row: 0,
     column: 6,
   },
   {
     id: 8,
-    pieceType: ROOK,
+    type: ROOK,
     team: BLACK_TEAM,
     row: 0,
     column: 7,
@@ -73,7 +73,7 @@ export default [
 
   {
     id: 9,
-    pieceType: PAWN,
+    type: PAWN,
     team: BLACK_TEAM,
     row: 1,
     column: 0,
@@ -81,7 +81,7 @@ export default [
   },
   {
     id: 10,
-    pieceType: PAWN,
+    type: PAWN,
     team: BLACK_TEAM,
     row: 1,
     column: 1,
@@ -89,7 +89,7 @@ export default [
   },
   {
     id: 11,
-    pieceType: PAWN,
+    type: PAWN,
     team: BLACK_TEAM,
     row: 1,
     column: 2,
@@ -97,7 +97,7 @@ export default [
   },
   {
     id: 12,
-    pieceType: PAWN,
+    type: PAWN,
     team: BLACK_TEAM,
     row: 1,
     column: 3,
@@ -105,7 +105,7 @@ export default [
   },
   {
     id: 13,
-    pieceType: PAWN,
+    type: PAWN,
     team: BLACK_TEAM,
     row: 1,
     column: 4,
@@ -113,7 +113,7 @@ export default [
   },
   {
     id: 14,
-    pieceType: PAWN,
+    type: PAWN,
     team: BLACK_TEAM,
     row: 1,
     column: 5,
@@ -121,7 +121,7 @@ export default [
   },
   {
     id: 15,
-    pieceType: PAWN,
+    type: PAWN,
     team: BLACK_TEAM,
     row: 1,
     column: 6,
@@ -129,7 +129,7 @@ export default [
   },
   {
     id: 16,
-    pieceType: PAWN,
+    type: PAWN,
     team: BLACK_TEAM,
     row: 1,
     column: 7,
@@ -138,7 +138,7 @@ export default [
 
   {
     id: 17,
-    pieceType: PAWN,
+    type: PAWN,
     team: WHITE_TEAM,
     row: 6,
     column: 0,
@@ -146,7 +146,7 @@ export default [
   },
   {
     id: 18,
-    pieceType: PAWN,
+    type: PAWN,
     team: WHITE_TEAM,
     row: 6,
     column: 1,
@@ -154,7 +154,7 @@ export default [
   },
   {
     id: 19,
-    pieceType: PAWN,
+    type: PAWN,
     team: WHITE_TEAM,
     row: 6,
     column: 2,
@@ -162,7 +162,7 @@ export default [
   },
   {
     id: 20,
-    pieceType: PAWN,
+    type: PAWN,
     team: WHITE_TEAM,
     row: 6,
     column: 3,
@@ -170,7 +170,7 @@ export default [
   },
   {
     id: 21,
-    pieceType: PAWN,
+    type: PAWN,
     team: WHITE_TEAM,
     row: 6,
     column: 4,
@@ -178,7 +178,7 @@ export default [
   },
   {
     id: 22,
-    pieceType: PAWN,
+    type: PAWN,
     team: WHITE_TEAM,
     row: 6,
     column: 5,
@@ -186,7 +186,7 @@ export default [
   },
   {
     id: 23,
-    pieceType: PAWN,
+    type: PAWN,
     team: WHITE_TEAM,
     row: 6,
     column: 6,
@@ -194,7 +194,7 @@ export default [
   },
   {
     id: 24,
-    pieceType: PAWN,
+    type: PAWN,
     team: WHITE_TEAM,
     row: 6,
     column: 7,
@@ -203,7 +203,7 @@ export default [
 
   {
     id: 25,
-    pieceType: ROOK,
+    type: ROOK,
     team: WHITE_TEAM,
     row: 7,
     column: 0,
@@ -211,28 +211,28 @@ export default [
   },
   {
     id: 26,
-    pieceType: KNIGHT,
+    type: KNIGHT,
     team: WHITE_TEAM,
     row: 7,
     column: 1,
   },
   {
     id: 27,
-    pieceType: BISHOP,
+    type: BISHOP,
     team: WHITE_TEAM,
     row: 7,
     column: 2,
   },
   {
     id: 28,
-    pieceType: QUEEN,
+    type: QUEEN,
     team: WHITE_TEAM,
     row: 7,
     column: 3,
   },
   {
     id: 29,
-    pieceType: KING,
+    type: KING,
     team: WHITE_TEAM,
     row: 7,
     column: 4,
@@ -241,21 +241,21 @@ export default [
   },
   {
     id: 30,
-    pieceType: BISHOP,
+    type: BISHOP,
     team: WHITE_TEAM,
     row: 7,
     column: 5,
   },
   {
     id: 31,
-    pieceType: KNIGHT,
+    type: KNIGHT,
     team: WHITE_TEAM,
     row: 7,
     column: 6,
   },
   {
     id: 32,
-    pieceType: ROOK,
+    type: ROOK,
     team: WHITE_TEAM,
     row: 7,
     column: 7,

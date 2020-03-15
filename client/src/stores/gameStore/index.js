@@ -19,6 +19,11 @@ class GameStore {
     });
   }
 
+  getPiece(row, column) {
+    const locationHash = createLocationHash(row, column);
+    return this.board[locationHash];
+  }
+
   movePiece(startLocation, endLocation) {
     const [startRow, startColumn] = startLocation;
     const [endRow, endColumn] = endLocation;
@@ -40,6 +45,7 @@ export const GAME_STORE_PROP_TYPES = PropTypes.shape({
   whiteKingLocation: PropTypes.arrayOf(PropTypes.number).isRequired,
   blackKingLocation: PropTypes.arrayOf(PropTypes.number).isRequired,
   initializeGame: PropTypes.func.isRequired,
+  getPiece: PropTypes.func.isRequired,
   movePiece: PropTypes.func.isRequired,
 });
 

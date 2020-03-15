@@ -3,12 +3,19 @@ import { css } from '@emotion/core';
 
 import { WHITE_SQUARE, GRAY_SQUARE } from '../../constants/colors';
 
-const shadedStyles = css`
-  background-color: ${GRAY_SQUARE};
+export const Board = styled.div`
+  margin: 8px auto;
+  border: solid 2px;
+  width: 536px;
+  height: 536px;
 `;
 
 export const Row = styled.div`
   display: flex;
+`;
+
+const shadedStyles = css`
+  background-color: ${GRAY_SQUARE};
 `;
 
 export const Square = styled.div`

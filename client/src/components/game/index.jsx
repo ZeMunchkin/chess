@@ -1,10 +1,11 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
 
-// import { GAME_STORE_PROP_TYPES } from '../../stores/gameStore/index';
+import { GAME_STORE_PROP_TYPES } from '../../stores/gameStore/index';
 import { BOARD_SIZE, WHITE_TEAM } from '../../constants/index';
 import { isShaded } from '../../utils/squareHelpers';
-import { Square, Row } from './style';
+import Piece from '../piece';
+import { Board, Square, Row } from './style';
 
 const boardArray = new Array(BOARD_SIZE).fill(null);
 
@@ -17,29 +18,37 @@ class Game extends React.Component {
   }
 
   render() {
+    const { gameStore } = this.props;
+
     return (
       <div>
-        <h3>{this.state.teamTurn}</h3>
-        <div>
-          {boardArray.map((rowEl, row) => (
-            <Row>
-              {boardArray.map((colEl, column) => (
-                <Square
-                  isShaded={isShaded(row, column)}
-                  data-row={row}
-                  data-column={column}
-                />
-              ))}
+        <h1>{this.state.teamTurn}</h1>
+        <Board>
+          {boardArray.map((_r, row) => (
+            <Row key={`row-${row}`}>
+              {boardArray.map((_c, column) => {
+                const piece = gameStore.getPiece(row, column);
+                return (
+                  <Square
+                    key={`square-${row}-${column}`}
+                    isShaded={isShaded(row, column)}
+                    data-row={row}
+                    data-column={column}
+                  >
+                    {piece && <Piece piece={piece} />}
+                  </Square>
+                );
+              })}
             </Row>
           ))}
-        </div>
+        </Board>
       </div>
     );
   }
 }
 
 Game.propTypes = {
-  // gameStore: GAME_STORE_PROP_TYPES.isRequired,
+  gameStore: GAME_STORE_PROP_TYPES.isRequired,
 };
 
 export default inject('gameStore')(observer(Game));

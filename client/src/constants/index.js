@@ -14,7 +14,7 @@ export const ROOK = 'rook';
 
 export const PIECE_PROP_TYPES = PropTypes.shape({
   id: PropTypes.number.isRequired,
-  pieceType: PropTypes.oneOf([ BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK ]).isRequired,
+  type: PropTypes.oneOf([ BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK ]).isRequired,
   team: PropTypes.oneOf([ WHITE_TEAM, BLACK_TEAM ]).isRequired,
   row: PropTypes.number.isRequired,
   column: PropTypes.number.isRequired,
