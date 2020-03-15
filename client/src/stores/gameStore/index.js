@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 
 import INITIAL_BOARD_STATE from '../../constants/startingBoardState';
 import { PIECE_PROP_TYPES } from '../../constants/index';
-import createLocationHash from '../../utils/createLocationHash';
+import { createLocationHash } from '../../utils/locationHash';
 
-class boardStore {
+class GameStore {
   constructor() {
     this.board = {};
     this.whiteKingLocation = [7, 4];
     this.blackKingLocation = [0, 4];
   }
 
-  initializeBoard() {
+  initializeGame() {
     INITIAL_BOARD_STATE.forEach(piece => {
       const locationHash = createLocationHash(piece.row, piece.column);
       this.board[locationHash] = Object.assign({}, piece);
@@ -29,20 +29,21 @@ class boardStore {
 
     piece.row = endRow;
     piece.column = endColumn;
+    piece.hasMoved = true;
     this.board[endLocationHash] = piece;
     delete this.board[startLocationHash];
   }
 }
 
-export const BOARD_STORE_PROP_TYPES = PropTypes.shape({
+export const GAME_STORE_PROP_TYPES = PropTypes.shape({
   board: PropTypes.objectOf(PIECE_PROP_TYPES).isRequired,
   whiteKingLocation: PropTypes.arrayOf(PropTypes.number).isRequired,
   blackKingLocation: PropTypes.arrayOf(PropTypes.number).isRequired,
-  initializeBoard: PropTypes.func.isRequired,
+  initializeGame: PropTypes.func.isRequired,
   movePiece: PropTypes.func.isRequired,
 });
 
-export default decorate(boardStore, {
+export default decorate(GameStore, {
   board: observable,
   whiteKingLocation: observable,
   blackKingLocation: observable,

@@ -24,14 +24,12 @@ class Board extends React.Component {
     this.handlePromotionSelect = this.handlePromotionSelect.bind(this);
   }
 
-
   componentDidMount() {
     this.setState({ // eslint-disable-line
       whiteKing: this.state.board[7][4],
       blackKing: this.state.board[0][4],
     });
   }
-
 
   newGame() {
     this.setState(createState());

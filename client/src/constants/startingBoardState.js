@@ -16,6 +16,7 @@ export default [
     team: BLACK_TEAM,
     row: 0,
     column: 0,
+    hasMoved: false,
   },
   {
     id: 2,
@@ -67,6 +68,7 @@ export default [
     team: BLACK_TEAM,
     row: 0,
     column: 7,
+    hasMoved: false,
   },
 
   {
@@ -205,6 +207,7 @@ export default [
     team: WHITE_TEAM,
     row: 7,
     column: 0,
+    hasMoved: false,
   },
   {
     id: 26,
@@ -256,5 +259,6 @@ export default [
     team: WHITE_TEAM,
     row: 7,
     column: 7,
+    hasMoved: false,
   },
 ];
